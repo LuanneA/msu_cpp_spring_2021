@@ -7,7 +7,6 @@ private:
     char *ptr;
     size_t offset;
     size_t size_alloc;
-    bool ind;
 public:
     Allocator ();
     ~Allocator ();
