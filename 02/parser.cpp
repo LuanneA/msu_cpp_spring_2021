@@ -9,8 +9,7 @@ TokenParser::TokenParser(){
     string_Callback = nullptr;
 }
 
-TokenParser:: ~TokenParser(){
-}
+TokenParser:: ~TokenParser(){}
 
 void TokenParser::SetStartCallback(const StartEnd & start){
     start_Callback = start;
@@ -31,7 +30,7 @@ void TokenParser::SetStringTokenCallback(const Str & string){
 void TokenParser::Function_For_Token(string &temp_text, bool digit_vs_str, vector<string> &output){
     if (digit_vs_str) {
         if(digit_Callback != nullptr){
-            output.push_back(digit_Callback(stoi(temp_text)));
+            output.push_back(digit_Callback(stoull(temp_text)));
         }
     } else {
         if(string_Callback != nullptr){
@@ -57,6 +56,13 @@ vector<string> TokenParser::parser(const string & text){
             temp_text += c;
         } else {
             if (!temp_text.empty()){
+                if (digit_vs_str){
+                    try{
+                        stoull(temp_text);
+                    } catch(out_of_range){
+                        digit_vs_str = false;
+                    }
+                }
                 Function_For_Token(temp_text, digit_vs_str, output);
                 temp_text.clear();
                 digit_vs_str = true;

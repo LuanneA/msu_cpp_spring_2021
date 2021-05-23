@@ -13,7 +13,7 @@ string End(){
 }
 
 string Digit1(int digit){
-    return to_string(digit);
+    return to_string(digit)+"Digit";
 }
 
 string Digit_square(int digit){
@@ -39,9 +39,42 @@ void defaultWorkTest(){
     //for(int i = 0; i < myVector.size(); i++)
      //   cout << myVector[i] << ' ';
     const std::vector<std::string> tokens =
-    {"Begin", "first", "april", "hello", "7","10", "End"};
+        {"Begin", "first", "april", "hello", "7Digit","10Digit", "End"};
     assert(myVector == tokens);
 }
+
+void WhitespaceTest(){
+    TokenParser parserFirst;
+    parserFirst.SetStartCallback(Start);
+    parserFirst.SetEndCallback(End);
+    parserFirst.SetDigitTokenCallback(Digit1);
+    parserFirst.SetStringTokenCallback(Str1);
+    string s = "    ";
+    vector<string> myVector = parserFirst.parser(s);
+    const std::vector<std::string> tokens = {"Begin", "End"};
+    assert(myVector == tokens);
+}
+
+void SingleCharacterTest(){
+    TokenParser parserFirst;
+    parserFirst.SetDigitTokenCallback(Digit1);
+    parserFirst.SetStringTokenCallback(Str1);
+    string s = "1 a g 5 6 d";
+    vector<string> myVector = parserFirst.parser(s);
+    const std::vector<std::string> tokens = {"1Digit", "a", "g", "5Digit", "6Digit", "d"};
+    assert(myVector == tokens);
+}
+
+void MixedTest(){
+    TokenParser parserFirst;
+    parserFirst.SetDigitTokenCallback(Digit_square);
+    parserFirst.SetStringTokenCallback(Str_double);
+    string s = "first1 april04  \t\nhello 7\r  10O";
+    vector<string> myVector = parserFirst.parser(s);
+    const std::vector<std::string> tokens = {"first1first1", "april04april04", "hellohello", "49", "10O10O"};
+    assert(myVector == tokens);
+}
+
 
 void emptyTest(){
     TokenParser parserZero;
@@ -62,7 +95,7 @@ void anotherWorkTest(){
     //for(int i = 0; i < myVector.size(); i++)
     //    cout << myVector[i] << ' ';
     const std::vector<std::string> tokens =
-    {"Begin", "firstfirst", "aprilapril", "hellohello", "49","100", "End"};
+        {"Begin", "firstfirst", "aprilapril", "hellohello", "49","100", "End"};
     assert(myVector == tokens);
 }
 
@@ -70,6 +103,9 @@ int main(){
     defaultWorkTest();
     emptyTest();
     anotherWorkTest();
+    WhitespaceTest();
+    SingleCharacterTest();
+    MixedTest();
     cout << "OK"<< '\n';
     return 0;
 }

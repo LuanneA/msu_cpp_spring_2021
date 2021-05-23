@@ -4,9 +4,9 @@
 #include <vector>
 using namespace std;
 
-using StartEnd = function<string ()>;
-using Digit = function<string (int)>;
-using Str = function<string (const string &)>;
+using StartEnd = function<string()>;
+using Digit = function<string(uint64_t)>;
+using Str = function<string(const string &)>;
 
 class TokenParser{
 private:
