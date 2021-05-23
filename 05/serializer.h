@@ -22,6 +22,11 @@ class Serializer{
         Error operator()(ArgsT && ... args){
             return process(forward<ArgsT>(args)...);
         }
+
+
+    private:
+        static constexpr char Separator = ' ';
+        ostream& out_;
         Error process1(bool arg){
             if (arg == true){
                 out_ << "true";
@@ -56,11 +61,6 @@ class Serializer{
         Error process(T && Arg){
             return process1(Arg);
         }
-
-
-    private:
-        static constexpr char Separator = ' ';
-        ostream& out_;
 };
 
 class Deserializer{
@@ -75,9 +75,16 @@ class Deserializer{
 
         template <class ... ArgsT>
         Error operator()(ArgsT && ... args){
-               return process(forward<ArgsT>(args)...);
+            Error err = process(forward<ArgsT>(args)...);
+            if (!in_.eof()){
+                return Error::CorruptedArchive;
+            }
+            return err;
         }
 
+    private:
+        static constexpr char Separator = ' ';
+        istream& in_;
         template <class T>
         Error process2(T arg){
             return Error::CorruptedArchive;
@@ -115,14 +122,14 @@ class Deserializer{
             in_ >> text;
             try{
                 value = stoull(text);
-                return Error::NoError;
-            }
-            catch(Error & err){
+                string x = to_string(value);
+                if (x == text){
+                    return Error::NoError;
+                }
+            } catch(out_of_range & err){
                    return Error::CorruptedArchive;
             }
+            return Error::CorruptedArchive;
         }
-    private:
-        static constexpr char Separator = ' ';
-        istream& in_;
 };
 
