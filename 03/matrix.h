@@ -5,9 +5,11 @@ using namespace std;
 class ProxyRow{
     private:
         int *data_;
+        size_t size_;
     public:
     int & operator[](size_t j);
-    ProxyRow(int *data);
+    const int & operator[](size_t j) const;
+    ProxyRow(int *data, size_t size_);
 };
 
 class Matrix{
@@ -17,13 +19,13 @@ class Matrix{
         Matrix operator=(const Matrix& M);
         bool operator==(const Matrix &M) const;
         bool operator!=(const Matrix &M) const;
-        Matrix operator*=(int n);
+        Matrix& operator*=(int n);
         Matrix operator+(const Matrix &M) const;
         ProxyRow operator[](size_t r);
-        ProxyRow operator[](size_t r) const;
+        const ProxyRow operator[](size_t r) const;
         friend std::ostream &operator<<(std::ostream &out, const Matrix &M);
-        size_t getRows();
-        size_t getColumns();
+        size_t getRows() const;
+        size_t getColumns() const;
         ~Matrix();
     private:
         ProxyRow *rows_;

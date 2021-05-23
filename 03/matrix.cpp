@@ -3,11 +3,22 @@
 using namespace std;
 
 int & ProxyRow::operator[](size_t j){
+    if (j >= size_){
+        throw std::out_of_range("");
+    }
     return data_[j];
 }
 
-ProxyRow::ProxyRow(int *data){
+const int & ProxyRow::operator[](size_t j) const{
+    if (j >= size_){
+        throw std::out_of_range("");
+    }
+    return data_[j];
+}
+
+ProxyRow::ProxyRow(int *data, size_t size){
     data_ = data;
+    size_ = size;
 }
 
 
@@ -61,7 +72,7 @@ bool Matrix::operator!=(const Matrix &M) const{
     return (!(*this == M));
 }
 
-Matrix Matrix::operator*=(int n){
+Matrix& Matrix::operator*=(int n){
     for (size_t i = 0; i < rows; ++i) {
         for (size_t j = 0; j < cols; ++j){
             matrix[i][j] *= n;
@@ -87,15 +98,14 @@ ProxyRow Matrix::operator[](size_t r){
     if (r >= rows){
         throw std::out_of_range("");
     }
-    return ProxyRow(matrix[r]);
+    return ProxyRow(matrix[r], cols);
 }
 
-ProxyRow Matrix::operator[](size_t r) const
-{
+const ProxyRow Matrix::operator[](size_t r) const{
     if (r >= rows){
         throw std::out_of_range("");
     }
-    return ProxyRow(matrix[r]);
+    return ProxyRow(matrix[r], cols);
 }
 
 std::ostream& operator<<(std::ostream &out, const Matrix &M){
@@ -108,11 +118,11 @@ std::ostream& operator<<(std::ostream &out, const Matrix &M){
     return out;
 }
 
-size_t Matrix::getRows(){
+size_t Matrix::getRows() const{
     return rows;
 }
 
-size_t Matrix::getColumns(){
+size_t Matrix::getColumns() const{
     return cols;
 }
 

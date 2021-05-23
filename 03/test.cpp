@@ -3,7 +3,7 @@
 using namespace std;
 
 
-void Test1(){
+void Test_size(){
     const size_t rows = 5;
     const size_t cols = 3;
 
@@ -13,7 +13,7 @@ void Test1(){
     assert(m.getColumns() == 3);
 }
 
-void Test2(){
+void Test_input_multiplication(){
     const size_t rows = 5;
     const size_t cols = 3;
 
@@ -24,12 +24,22 @@ void Test2(){
             m[i][j] = i + j;
         }
     }
-    assert(m[4][1] == 5);
+    for (int i = 0; i < rows; i++){
+        for(int j = 0; j < cols; j++)
+        {
+            assert(m[i][j] == i + j);
+        }
+    }
     m *= 3;
-    assert(m[4][1] == 15);
+    for (int i = 0; i < rows; i++){
+        for(int j = 0; j < cols; j++)
+        {
+            assert(m[i][j] == (i + j)*3);
+        }
+    }
 }
 
-void Test3(){
+void Test_output(){
     const size_t rows = 5;
     const size_t cols = 3;
     Matrix m2(rows, cols);
@@ -47,11 +57,17 @@ void Test3(){
         }
     }
     Matrix m3 = m1 + m2;
+    for (int i = 0; i < rows; i++){
+        for(int j = 0; j < cols; j++)
+        {
+            m3[i][j] = m2[i][j] + m1[i][j];
+        }
+    }
     std::cout << m3 << std::endl; //проверка вывода матрицы
 }
 
 
-bool Test4(){
+bool Test_out_of_range(){
     bool exception = false;
     const size_t rows_1 = 5;
     const size_t cols_1 = 3;
@@ -65,7 +81,7 @@ bool Test4(){
     return exception;
 }
 
-void Test5(){
+void Test_copy(){
     const size_t rows = 5;
     const size_t cols = 3;
     Matrix m(rows, cols);
@@ -83,13 +99,53 @@ void Test5(){
     }
 }
 
+void Test_one_dim_matrix(){
+    const size_t rows = 1;
+    const size_t cols = 1;
+    Matrix m1(rows, cols);
+    Matrix m2(rows, cols);
+    m1[0][0] = 5;
+    m2[0][0] = 6;
+    Matrix m3 = m1 + m2;
+    assert(m3[0][0] == 11);
+}
+
+bool Test_Different_Dimensions(){
+    bool exception = false;
+    Matrix m1(4, 2);
+    Matrix m2(2, 4);
+    try{
+        Matrix m3 = m1 + m2;
+    } catch(out_of_range){
+        exception = true;
+    }
+    return exception;
+}
+
+bool Test_out_of_range2(){
+    bool exception = false;
+    const size_t rows_1 = 5;
+    const size_t cols_1 = 3;
+    Matrix m(rows_1, cols_1);
+    try {
+        m[3][8] = 17;
+    }
+    catch(out_of_range){
+        exception = true; //проверка выброса исключения
+    }
+    return exception;
+}
+
 int main(int argc, const char * argv[]) {
-    Test1();
-    Test2();
-    Test3();
-    Test5();
-    bool exception = Test4();
-    if (exception == true){
+    Test_size();
+    Test_input_multiplication();
+    Test_output();
+    Test_copy();
+    Test_one_dim_matrix();
+    bool exception1 = Test_out_of_range();
+    bool exception2 = Test_Different_Dimensions();
+    bool exception3 =  Test_out_of_range2();
+    if ((exception1 == true) and (exception2 == true) and (exception3 == true)){
         cout << "Okey" << endl;
     } else {
         cout << "Not Okey" << endl;
