@@ -6,13 +6,21 @@
 
 using namespace std;
 
-class MyException{
+class MyException1: public out_of_range{
 private:
     std::string m_error;
 public:
-    MyException(std::string error){
-        m_error = error;
-    }
+    explicit MyException1(const string &error):
+        out_of_range(error), m_error(error){}
+    const char* getError() { return m_error.c_str(); }
+};
+
+class MyException2: public logic_error{
+private:
+    std::string m_error;
+public:
+    explicit MyException2(const string &error):
+        logic_error(error), m_error(error){}
     const char* getError() { return m_error.c_str(); }
 };
 
@@ -27,17 +35,22 @@ template<class... Args>
 std::string format(const string &str, Args &&... args) {
     string result;
     vector<string> vec = {to_string(forward<Args>(args))...};
+    vector<int> vec1(vec.size(), 0);
     int i = 0;
+    int count_arg = 0;
     bool inside = false;
     string index = "";
     while(i < str.length()){
         if (not inside){
             while (str[i] != '{'){
                 if (str[i] == '}'){
-                    throw MyException("unbalanced brackets");
+                    throw MyException2("unbalanced brackets");
                 }
                 result += str[i];
                 i++;
+                if (i >= str.length()){
+                    break;
+                }
             }
             if (i >= str.length()){
                 break;
@@ -49,20 +62,34 @@ std::string format(const string &str, Args &&... args) {
             } else {
                 if(str[i] == '}'){
                     if (index.length() > 0){
-                        int j = atoi(index.c_str());
-                        if (j >= vec.size()){
-                            throw MyException("insufficient number of arguments");
+                        int j;
+                        try{
+                            j = stoi(index.c_str());
+                        } catch(const out_of_range & e) {
+                            throw MyException2("error in {}");
                         }
+                        if (j >= vec.size()){
+                            throw MyException1("insufficient number of arguments");
+                        }
+                        vec1[j] = 1;
                         result += vec[j];
+                    } else {
+                        throw MyException2("empty {}");
                     }
                     inside = false;
                     index = "";
                 } else {
-                    throw MyException("error in {}");
+                    throw MyException2("error in {}");
                 }
             }
         }
         i++;
+    }
+    if (index != ""){
+        throw MyException2("unbalanced brackets");
+    }
+    if (find(vec1.begin(), vec1.end(),0) != vec1.end()){
+        throw MyException1("extra arguments");
     }
     return result;
 }
